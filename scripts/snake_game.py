@@ -21,9 +21,9 @@ class mySpawner:
         rospy.wait_for_service('/spawn')
         try:
             client = rospy.ServiceProxy('/spawn', Spawn)
-            x = random.randint(1, 10)
-            y = random.randint(1, 10)
-            theta = random.uniform(1, 3.14)
+            x = random.randint(1, 10)           # setting random x co-ordinate for new turtle to be spawned
+            y = random.randint(1, 10)           # setting random y co-ordinate for new turtle to be spawned
+            theta = random.uniform(1, 3.14)     # setting random theta value for new turtle to be spawned
             name = tname
             _nm = client(x, y, theta, name)
             rospy.loginfo("Turtle Created [%s] [%f] [%f]", name, x, y)
@@ -61,6 +61,9 @@ def turtle1_poseCallback(data):
         diff = math.sqrt(pow((turtle1_pose.x - Turtle_List[i].turtle_pose.x) , 2) + pow((turtle1_pose.y - Turtle_List[i].turtle_pose.y), 2))
         ang = math.atan2(turtle1_pose.y - Turtle_List[i].turtle_pose.y, turtle1_pose.x - Turtle_List[i].turtle_pose.x) - Turtle_List[i].turtle_pose.theta
         
+        if turtle1_pose.x > 11 or turtle1_pose.y>11 or turtle1_pose.x<1 or turtle1_pose.y<1:   #  to end the game when turtle hits an edge 
+            rospy.signal_shutdown("Chal Nikal")
+
         if(ang <= -3.14) or (ang > 3.14):
             ang = ang / math.pi
 
@@ -103,12 +106,12 @@ def spawn_turtle_fn():
     rospy.wait_for_service("/turtle1/set_pen")
     try:
         client = rospy.ServiceProxy('/turtle1/set_pen', SetPen)
-        client(0,0,0,0,1)
+        client(0,0,0,0,1)                                         # setting setpen client to revoke the ink of turtlesim 
     except rospy.ServiceException as e:
         print("Service call failed: %s"%e)
     
     Index_Next_Turtle += 1
-    Turtle_List.append(mySpawner("turtle" + str(Index_Next_Turtle)))
+    Turtle_List.append(mySpawner("turtle" + str(Index_Next_Turtle)))    # setting name of the new turtle to be spawned 
         
     rospy.spin()
 
