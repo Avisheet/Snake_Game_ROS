@@ -8,6 +8,7 @@ from geometry_msgs.msg import Twist
 from geometry_msgs.msg import TransformStamped
 import random
 import math
+import subprocess
 
 turtle1_pose = Pose()
 Turtle_List = []
@@ -63,6 +64,12 @@ def turtle1_poseCallback(data):
         
         if(ang <= -3.14) or (ang > 3.14):
             ang = ang / math.pi
+
+        if turtle1_pose.x>11 or turtle1_pose.y>11 or turtle1_pose.x<1 or turtle1_pose.y<1:
+            rospy.loginfo("Game Over !!")
+            rospy.signal_shutdown("Game Over")
+            command = ["rosnode","kill","-a"]
+            subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
 
         if (Turtle_List[i].state == 1):
             if diff < 1.0:
