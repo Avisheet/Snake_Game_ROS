@@ -8,7 +8,6 @@ from geometry_msgs.msg import Twist
 from geometry_msgs.msg import TransformStamped
 import random
 import math
-import subprocess
 
 turtle1_pose = Pose()
 Turtle_List = []
@@ -56,6 +55,11 @@ def turtle1_poseCallback(data):
     turtle1_pose.x = round(data.x, 4)
     turtle1_pose.y = round(data.y, 4)
     turtle1_pose.theta = round(data.theta, 4)
+    if data.x>9 or data.x<2 or data.y>9 or data.y<2:
+        rospy.loginfo('game over even dead i am the hero!')
+    if data.x>9.2 or data.x<1.8 or data.y>9.2 or data.y<1.8:    
+        rospy.signal_shutdown("jalwa hai hamara")
+        
 
     for i in range(len(Turtle_List)):
         twist_data = Twist()
@@ -65,18 +69,13 @@ def turtle1_poseCallback(data):
         if(ang <= -3.14) or (ang > 3.14):
             ang = ang / math.pi
 
-        if turtle1_pose.x>11 or turtle1_pose.y>11 or turtle1_pose.x<1 or turtle1_pose.y<1:
-            rospy.loginfo("Game Over !!")
-            rospy.signal_shutdown("Game Over")
-            command = ["rosnode","kill","-a"]
-            subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-
         if (Turtle_List[i].state == 1):
             if diff < 1.0:
                 Turtle_List[i].state = 2
                 Turtle_List[i].turtle_to_follow = Turtle_Last
                 Turtle_Last = i + 2
                 rospy.loginfo("Turtle Changed [%s] [%f] [%f]", Turtle_List[i].turtle_name, diff, ang)
+                rospy.loginfo("Your score is [%d]",len(Turtle_List))
                 Index_Next_Turtle += 1
                 Turtle_List.append(mySpawner("turtle" + str(Index_Next_Turtle)))
         else:
